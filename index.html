@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>七夕 短冊づくり</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Zen+Old+Mincho:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night-deep:#0b1930;
+    --night-mid:#132a4d;
+    --gold:#d4af6a;
+    --gold-soft:#e8caa0;
+    --paper:#faf6ee;
+    --bamboo:#2f5d4e;
+    --bamboo-dark:#1c3f34;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    min-height:100%;
+    font-family:"Shippori Mincho","Zen Old Mincho",serif;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #1c3a63 0%, transparent 60%),
+      radial-gradient(900px 500px at 90% 10%, #14284a 0%, transparent 55%),
+      linear-gradient(180deg,var(--night-deep) 0%, #081222 100%);
+    color:var(--paper);
+    overflow-x:hidden;
+  }
+
+  /* twinkling stars */
+  #stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+  .star{
+    position:absolute; background:#fff; border-radius:50%;
+    animation:twinkle 3.5s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:.15; transform:scale(.8);}
+    50%{opacity:1; transform:scale(1.15);}
+  }
+
+  .wrap{
+    position:relative; z-index:1;
+    max-width:1080px; margin:0 auto;
+    padding:56px 24px 100px;
+  }
+
+  header{ text-align:center; margin-bottom:44px; }
+  .kicker{
+    letter-spacing:.5em; font-size:12px; color:var(--gold-soft);
+    text-indent:.5em; margin-bottom:14px; opacity:.85;
+  }
+  h1{
+    font-family:"Zen Old Mincho",serif;
+    font-weight:900;
+    font-size:clamp(34px,6vw,58px);
+    margin:0 0 10px;
+    background:linear-gradient(180deg,#fff6df,var(--gold));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:.08em;
+  }
+  .sub{ color:#b9c6dd; font-size:14px; letter-spacing:.05em; }
+
+  .stage{
+    display:grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap:40px;
+    align-items:start;
+  }
+  @media (max-width:840px){
+    .stage{ grid-template-columns:1fr; }
+  }
+
+  /* --- form panel --- */
+  .panel{
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    border:1px solid rgba(212,175,106,.25);
+    border-radius:18px;
+    padding:28px;
+    backdrop-filter:blur(6px);
+  }
+  .field{ margin-bottom:22px; }
+  .field label{
+    display:block; font-size:13px; color:var(--gold-soft);
+    letter-spacing:.15em; margin-bottom:10px;
+  }
+  textarea, input[type=text]{
+    width:100%;
+    background:rgba(8,16,30,.55);
+    border:1px solid rgba(212,175,106,.35);
+    border-radius:10px;
+    color:var(--paper);
+    font-family:"Shippori Mincho",serif;
+    font-size:16px;
+    padding:12px 14px;
+    resize:vertical;
+    line-height:1.7;
+  }
+  textarea:focus, input:focus{
+    outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,106,.15);
+  }
+  textarea{ min-height:96px; }
+
+  .swatches{ display:flex; gap:12px; flex-wrap:wrap; }
+  .swatch{
+    width:44px; height:44px; border-radius:50%;
+    cursor:pointer; position:relative;
+    border:2px solid rgba(255,255,255,.15);
+    transition:transform .15s ease;
+  }
+  .swatch:hover{ transform:translateY(-3px); }
+  .swatch.active{ border-color:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.25); }
+  .swatch span{
+    position:absolute; bottom:-22px; left:50%; transform:translateX(-50%);
+    font-size:11px; color:#cbd6e8; white-space:nowrap;
+  }
+
+  .c-blue{ background:#2e5aa6; }
+  .c-red{ background:#c1443c; }
+  .c-yellow{ background:#dab634; }
+  .c-white{ background:#f2ede1; }
+  .c-purple{ background:#5c4a8a; }
+
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    width:100%;
+    padding:16px 20px;
+    border-radius:12px;
+    font-family:"Shippori Mincho",serif;
+    font-size:16px; letter-spacing:.1em;
+    background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+    color:#2a1d05; font-weight:700;
+    margin-top:8px;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .btn:hover{ filter:brightness(1.06); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn.secondary{
+    background:transparent;
+    border:1px solid rgba(212,175,106,.5);
+    color:var(--gold-soft);
+    font-weight:500;
+  }
+
+  /* --- bamboo / preview panel --- */
+  .stage-right{
+    position:relative;
+    min-height:560px;
+    display:flex; align-items:flex-end; justify-content:center;
+    padding-bottom:20px;
+  }
+  .bamboo-bg{
+    position:absolute; inset:0; z-index:0;
+    pointer-events:none;
+    opacity:.9;
+  }
+
+  #tanzakuHolder{ position:relative; z-index:2; }
+
+  canvas#tanzakuCanvas{
+    display:block;
+    border-radius:4px;
+    box-shadow:0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.2);
+  }
+
+  .hint{
+    text-align:center; font-size:12px; color:#8ea0bd; margin-top:16px;
+    letter-spacing:.05em;
+  }
+
+  footer{
+    text-align:center; margin-top:60px; font-size:11px; color:#5d6d89; letter-spacing:.1em;
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">TANABATA WISH</div>
+    <h1>短 冊 づ く り</h1>
+    <div class="sub">願い事をしたためて、あなただけの短冊を</div>
+  </header>
+
+  <div class="stage">
+    <!-- FORM -->
+    <div class="panel">
+      <div class="field">
+        <label>ねがいごと（縦書きで表示されます）</label>
+        <textarea id="wishText" maxlength="40" placeholder="例）家族みんなが健康でありますように">家族みんなが健康でありますように</textarea>
+      </div>
+
+      <div class="field">
+        <label>おなまえ（任意）</label>
+        <input type="text" id="nameText" maxlength="12" placeholder="例）たなばた太郎">
+      </div>
+
+      <div class="field">
+        <label>短冊の色（五色）</label>
+        <div class="swatches">
+          <div class="swatch c-blue active" data-color="#2e5aa6" data-ink="#f4efe3"><span>青</span></div>
+          <div class="swatch c-red" data-color="#c1443c" data-ink="#f9f2e6"><span>赤</span></div>
+          <div class="swatch c-yellow" data-color="#dab634" data-ink="#3a2b0a"><span>黄</span></div>
+          <div class="swatch c-white" data-color="#f2ede1" data-ink="#2a2a2a"><span>白</span></div>
+          <div class="swatch c-purple" data-color="#5c4a8a" data-ink="#f6f1e6"><span>紫</span></div>
+        </div>
+      </div>
+
+      <button class="btn" id="downloadBtn">短冊をダウンロード (PNG)</button>
+      <button class="btn secondary" id="hangBtn" style="margin-top:12px;">笹に飾る</button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="stage-right">
+      <svg class="bamboo-bg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMax slice">
+        <defs>
+          <linearGradient id="stalk" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#1c3f34"/>
+            <stop offset="50%" stop-color="#3a7060"/>
+            <stop offset="100%" stop-color="#1c3f34"/>
+          </linearGradient>
+        </defs>
+        <!-- stalks -->
+        <rect x="60" y="60" width="12" height="560" fill="url(#stalk)" rx="4"/>
+        <rect x="330" y="10" width="10" height="610" fill="url(#stalk)" rx="4"/>
+        <!-- leaves cluster left -->
+        <g fill="#2f5d4e" opacity="0.92">
+          <path d="M66 120 C 10 100, -20 60, -10 20 C 40 40, 70 70, 66 120 Z"/>
+          <path d="M66 200 C 130 175, 165 130, 150 90 C 100 105, 65 145, 66 200 Z"/>
+          <path d="M66 300 C 5 280, -25 235, -12 195 C 42 215, 70 250, 66 300 Z"/>
+          <path d="M66 400 C 135 375, 170 325, 152 285 C 100 302, 68 345, 66 400 Z"/>
+          <path d="M66 500 C 8 480, -20 435, -8 395 C 44 415, 70 450, 66 500 Z"/>
+        </g>
+        <g fill="#264c40" opacity="0.85">
+          <path d="M335 60 C 400 40, 430 -5, 415 -40 C 365 -25, 335 15, 335 60 Z"/>
+          <path d="M335 160 C 270 140, 235 95, 250 55 C 300 70, 335 110, 335 160 Z"/>
+          <path d="M335 260 C 405 240, 435 195, 420 155 C 368 172, 335 215, 335 260 Z"/>
+          <path d="M335 380 C 268 358, 232 310, 248 268 C 300 286, 335 330, 335 380 Z"/>
+          <path d="M335 480 C 402 460, 432 415, 418 375 C 366 392, 335 435, 335 480 Z"/>
+        </g>
+      </svg>
+
+      <div id="tanzakuHolder">
+        <canvas id="tanzakuCanvas" width="260" height="480"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">※ 願い事は40文字まで。色を選んでからダウンロードすると反映されます。</div>
+
+  <footer>TANABATA · 07 / 07</footer>
+</div>
+
+<script>
+// ---------- stars background ----------
+const starsEl = document.getElementById('stars');
+for(let i=0;i<90;i++){
+  const s = document.createElement('div');
+  s.className='star';
+  const size = Math.random()*2.2+0.6;
+  s.style.width = size+'px';
+  s.style.height = size+'px';
+  s.style.left = Math.random()*100+'%';
+  s.style.top = Math.random()*70+'%';
+  s.style.animationDelay = (Math.random()*3.5)+'s';
+  starsEl.appendChild(s);
+}
+
+// ---------- state ----------
+let currentColor = '#2e5aa6';
+let currentInk = '#f4efe3';
+
+const swatches = document.querySelectorAll('.swatch');
+swatches.forEach(sw=>{
+  sw.addEventListener('click', ()=>{
+    swatches.forEach(s=>s.classList.remove('active'));
+    sw.classList.add('active');
+    currentColor = sw.dataset.color;
+    currentInk = sw.dataset.ink;
+    draw();
+  });
+});
+
+const wishText = document.getElementById('wishText');
+const nameText = document.getElementById('nameText');
+wishText.addEventListener('input', draw);
+nameText.addEventListener('input', draw);
+
+const canvas = document.getElementById('tanzakuCanvas');
+const ctx = canvas.getContext('2d');
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function draw(){
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.35)';
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 10;
+
+  // paper base
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, lighten(currentColor, 10));
+  grad.addColorStop(1, currentColor);
+  ctx.fillStyle = grad;
+  roundRect(ctx, 10, 10, W-20, H-20, 6);
+  ctx.fill();
+  ctx.restore();
+
+  // subtle paper texture (fibers)
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.strokeStyle = '#000';
+  for(let i=0;i<40;i++){
+    ctx.beginPath();
+    const x = Math.random()*(W-20)+10;
+    ctx.moveTo(x,10);
+    ctx.lineTo(x+ (Math.random()*6-3), H-10);
+    ctx.lineWidth = Math.random()*0.6;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // border
+  ctx.strokeStyle = 'rgba(255,255,255,.35)';
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, 10, 10, W-20, H-20, 6);
+  ctx.stroke();
+
+  // hole + string
+  ctx.beginPath();
+  ctx.arc(W/2, 26, 6, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(0,0,0,.25)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(W/2, 26, 6, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,.3)';
+  ctx.stroke();
+
+  // gold thread
+  ctx.beginPath();
+  ctx.moveTo(W/2-30,-6);
+  ctx.quadraticCurveTo(W/2,20,W/2+30,-6);
+  ctx.strokeStyle = '#d4af6a';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // vertical text: wish
+  const text = wishText.value || '';
+  ctx.fillStyle = currentInk;
+  ctx.font = '600 26px "Shippori Mincho", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const startX = W/2 + 28;
+  const startY = 70;
+  const lineHeight = 30;
+  const colGap = 46;
+  const maxCharsPerCol = Math.floor((H-140)/lineHeight);
+
+  let col = 0, row = 0;
+  for(let i=0;i<text.length;i++){
+    const ch = text[i];
+    const x = startX - col*colGap;
+    const y = startY + row*lineHeight;
+    if(y > H-70){ break; }
+    ctx.fillText(ch, x, y);
+    row++;
+    if(row >= maxCharsPerCol){ row=0; col++; }
+  }
+
+  // name, smaller, bottom-left vertical
+  const name = nameText.value || '';
+  if(name){
+    ctx.font = '500 15px "Shippori Mincho", serif';
+    ctx.globalAlpha = 0.85;
+    const nx = 34;
+    let ny = H-40 - (name.length-1)*18;
+    for(let i=0;i<name.length;i++){
+      ctx.fillText(name[i], nx, ny);
+      ny += 18;
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+function lighten(hex, amt){
+  const num = parseInt(hex.replace('#',''),16);
+  let r = (num>>16)+amt, g=((num>>8)&0xff)+amt, b=(num&0xff)+amt;
+  r=Math.min(255,Math.max(0,r)); g=Math.min(255,Math.max(0,g)); b=Math.min(255,Math.max(0,b));
+  return `rgb(${r},${g},${b})`;
+}
+
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const link = document.createElement('a');
+  link.download = 'tanzaku.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+document.getElementById('hangBtn').addEventListener('click', ()=>{
+  const holder = document.getElementById('tanzakuHolder');
+  holder.style.transition = 'transform .6s ease';
+  holder.style.transform = 'translateY(-14px) rotate(-2deg)';
+  setTimeout(()=>{ holder.style.transform = 'translateY(0) rotate(2deg)'; }, 650);
+  setTimeout(()=>{ holder.style.transform = 'translateY(-4px) rotate(-1deg)'; }, 1300);
+});
+
+draw();
+</script>
+</body>
+</html>
